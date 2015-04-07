@@ -1,7 +1,7 @@
 
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
-/*
+
 var startFrameMillis = Date.now();
 var endFrameMillis = Date.now();
 
@@ -41,53 +41,26 @@ var fps = 0;
 var fpsCount = 0;
 var fpsTime = 0;
 
-
-*/
-
-
-
-
-
-var Cat = function(breed){
-	this.breed = breed;
-}
-
- Cat.prototype.meow = function meow()
-{
-	document.write("Meow");	
-}
-
-var ginger = new Cat("Ginger");
-
-ginger.meow();
-
-
-
-
-
-
-/*
 // load an image to draw
-var chuckNorris = document.createElement("img");
-chuckNorris.src = "hero.png";
+//var chuckNorris = document.createElement("img");
+//chuckNorris.src = "hero.png";
+var xYPointer = document.createElement("img");
+xYPointer.src = "xypointer.png";
 
-function OnKeyDown(event)
-{
-	document.writeln(event.keyName + ": " + event.keyCode);
-}
+var keyboard = new Keyboard();
+var player = new Player();
 
 function run()
 {
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
-	window.addEventListener('keydown', OnKeyDown);
-	
 	var deltaTime = getDeltaTime();
+
 	
-	context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
 	
-		
+	player.update(deltaTime);
+	player.draw();
 	// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -102,8 +75,8 @@ function run()
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
+	context.fillText("PlayerPos: " + player.position.toString(), 5, 40, 100);
 }
-
 
 //-------------------- Don't modify anything below here
 
@@ -132,4 +105,3 @@ function run()
 })();
 
 window.onEachFrame(run);
-*/
