@@ -49,6 +49,7 @@ xYPointer.src = "xypointer.png";
 
 var keyboard = new Keyboard();
 var player = new Player();
+var enemy = new Enemy();
 
 function run()
 {
@@ -56,11 +57,13 @@ function run()
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
 	var deltaTime = getDeltaTime();
-
-	
 	
 	player.update(deltaTime);
 	player.draw();
+	
+	enemy.update(deltaTime);
+	enemy.draw();
+	
 	// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -70,12 +73,22 @@ function run()
 		fps = fpsCount;
 		fpsCount = 0;
 	}		
+	
+	if(document.getElementById("subX"))
+	{
+		player.position.x = document.getElementById("playerx").value;
+	}
+	if(document.getElementById("subY"))
+	{
+		player.position.y = document.getElementById("playery").value;
+	}
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 	context.fillText("PlayerPos: " + player.position.toString(), 5, 40, 100);
+	context.fillText("EnemyPos: " + enemy.position.toString(), 5, 60, 100);
 }
 
 //-------------------- Don't modify anything below here

@@ -2,7 +2,7 @@ var Enemy = function()
 {
 	this.image = document.createElement("img");
 	
-	this.position = new Vector2(canvas.width / 2 - 40, canvas.height / 2);
+	this.position = new Vector2(canvas.width - 80, canvas.height / 2);
 
 	this.scale = new Vector2(159, 163);
 	
@@ -16,18 +16,18 @@ var Enemy = function()
 	
 	this.rotation = 0;
 	
-	this.image.src = "hero.png";
+	this.image.src = "enemy.png";
 };
 
 Enemy.prototype.update = function(deltaTime) 
 {
 	if(keyboard.isKeyDown(keyboard.KEY_SPACE))
 	{
-		this.rotation += deltaTime; 
+		//this.rotation += deltaTime; 
 	}
 	else
 	{
-		this.rotation -= deltaTime; 
+		//this.rotation -= deltaTime; 
 	}
 }
 

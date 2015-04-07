@@ -2,7 +2,7 @@ var Player = function()
 {
 	this.image = document.createElement("img");
 	
-	this.position = new Vector2(40, canvas.height / 2);
+	this.position = new Vector2(80, canvas.height / 2);
 
 	this.scale = new Vector2(159, 163);
 	
@@ -23,11 +23,11 @@ Player.prototype.update = function(deltaTime)
 {
 	if(keyboard.isKeyDown(keyboard.KEY_SPACE))
 	{
-		this.rotation += deltaTime; 
+		//this.rotation += deltaTime; 
 	}
 	else
 	{
-		this.rotation -= deltaTime; 
+		//this.rotation -= deltaTime; 
 	}
 }
 
