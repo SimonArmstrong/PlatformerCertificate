@@ -44,7 +44,7 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
-var map = new Map(testLevel, "tileset.png");
+var map = new Map(level1, "tileset.png");
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
@@ -108,7 +108,7 @@ function cellAtTileCoord(layer, tx, ty)
 		return 0;
 	}
 	
-	return cells[layer][tx][ty];
+	return cells[layer][ty][tx];
 }
 
 function cellAtPixelCoord(layer, x, y)
@@ -122,12 +122,16 @@ function cellAtPixelCoord(layer, x, y)
 
 function run()
 {
+	context.fillStyle = "#fff"
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
 	map.drawMap();
-
 	var deltaTime = getDeltaTime();
 	
 	player.update(deltaTime);
 	player.draw();
+	
+	//console.log(player.position.toString());
 	
 	//enemy.update(deltaTime);
 	//enemy.draw();

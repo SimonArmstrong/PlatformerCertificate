@@ -3,10 +3,12 @@ var Player = function()
 	this.image = document.createElement("img");
 	this.image.src = "hero.png";
 	
-	this.position = new Vector2(80, canvas.height / 2);
-	this.scale = new Vector2(159, 163);
+	this.position = new Vector2(277, 245);
+	this.scale = new Vector2(159, 180);
 	this.width = this.scale.x;
 	this.height = this.scale.y;
+	
+	this.jumping = false;
 	
 	this.velocity = new Vector2(0, 0);
 	this.angularVelocity = 0;
@@ -18,6 +20,7 @@ Player.prototype.update = function(deltaTime)
 	var acceleration = new Vector2(0, 0);
 	var playerAccel = 5000;
 	var playerDrag = 11;
+	var jumpForce = 37500;
 	var playerGravity = map.TILE * 9.8 * 4;
 	
 	acceleration.y = playerGravity;
@@ -30,14 +33,16 @@ Player.prototype.update = function(deltaTime)
 	{
 		acceleration.x += playerAccel;
 	}
-	if(keyboard.isKeyDown(keyboard.KEY_UP))
+	if(keyboard.isKeyDown(keyboard.KEY_SPACE) && !this.jumping)
 	{
-		acceleration.y -= playerAccel;
+		acceleration.y -= jumpForce;
+		this.jumping = true;
 	}
-	if(keyboard.isKeyDown(keyboard.KEY_DOWN))
+	if(!keyboard.isKeyDown(keyboard.KEY_SPACE))
 	{
-		acceleration.y += playerAccel;
+		this.jumping = false;
 	}
+
 	var dragVector = this.velocity.multiplyScalar(playerDrag);
 	dragVector.y = 0;
 	acceleration = acceleration.subtract(dragVector);

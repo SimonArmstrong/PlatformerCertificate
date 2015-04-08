@@ -44,5 +44,5 @@ Vector2.prototype.normalize = function(){
 }
 
 Vector2.prototype.toString = function(){
-	return "(" + this.x + ", " + this.y + ")";
+	return "(X: " + Math.round(this.x) + ", Y: " + Math.round(this.y) + ")";
 }

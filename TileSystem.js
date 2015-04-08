@@ -10,12 +10,12 @@ var Map = function(level, tilesetImage)
 	this.TILESET_PADDING = level.tilesets[0].margin;
 	this.TILESET_SPACING = level.tilesets[0].spacing;
 	
-	this.LAYER_SKY = 0;
-	this.LAYER_BACKGROUND_FAR = 1;
-	this.LAYER_BACKGROUND_WALLS = 2;
-	this.LAYER_BACKGROUND = 3;
-	this.LAYER_PLATFORMS = 4;
-	this.LAYER_LADDERS = 5;
+	//this.LAYER_SKY = 0;
+	//this.LAYER_BACKGROUND_FAR = 1;
+	//this.LAYER_BACKGROUND_WALLS = 2;
+	this.LAYER_BACKGROUND = 0;
+	this.LAYER_PLATFORMS = 1;
+	this.LAYER_LADDERS = 2;
 
 	this.tileset = document.createElement("img");
 	this.tileset.src = tilesetImage;
@@ -32,7 +32,7 @@ Map.prototype.drawMap = function()
 		{
 			for(var x = 0; x < this.level.layers[layerIdx].width; x++)
 			{
-				if(this.level.layers[layerIdx].data[idx] != 0)
+				if(this.level.layers[layerIdx].data[idx] != 0 && this.level.layers[layerIdx].visible == true)
 				{
 					var tileIndex = this.level.layers[layerIdx].data[idx] - 1;
 					var sx = this.TILESET_PADDING + (tileIndex % this.TILESET_COUNT_X) * (this.TILESET_TILE + this.TILESET_PADDING);
