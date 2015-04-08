@@ -33,7 +33,6 @@ function getDeltaTime()
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 
-
 // some variables to calculate the Frames Per Second (FPS - this tells use
 // how fast our game is running, and allows us to make the game run at a 
 // constant speed)
@@ -45,42 +44,41 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
+var map = new Map(testLevel, "tileset.png");
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
 
-var layerCount = 6;
-var MAP = {tw: 20, th: 25};
-var TILE = 35;				//The Tile Dimensions on the X and Y
-var TILESET_TILE = TILE*2;
-var TILESET_PADDING = 2;
-var TILESET_SPACING = 2;
-var TILESET_COUNT_X = 14;	//Tiles along the x on the tileset image
-var TILESET_COUNT_Y = 14;	//Tiles along the y on the tileset image
 
-var MAP_WIDTH = (MAP.tw * TILE);
-var MAP_HEIGHT = (MAP.th * TILE);
-canvas.width = MAP_WIDTH;
-canvas.height = MAP_HEIGHT;
+canvas.width = map.MAP_WIDTH;
+canvas.height = map.MAP_HEIGHT;
 
-var tileset = document.createElement("img");
-tileset.src = "tileset.png";
 
-function drawMap()
+
+var cells = [];
+function inititalizeCollision()
 {
-	for(var layerIdx = 0; layerIdx < layerCount; layerIdx++)
+	for(var layerIdx = 0; layerIdx < map.layerCount; layerIdx++)
 	{
+		cells[layerIdx] = [];
 		var idx = 0;
-		for(var y = 0; y < testLevel.layers[layerIdx].height; y++)
+		//loop through each row
+		for(var y = 0; y < map.level.layers[layerIdx].height; y++)
 		{
-			for(var x = 0; x < testLevel.layers[layerIdx].width; x++)
+			cells[layerIdx][y] = [];
+			//loop through each cell
+			for(var x = 0; x < map.level.layers[layerIdx].width; x++)
 			{
-				if(testLevel.layers[layerIdx].data[idx] != 0)
+				if(map.level.layers[layerIdx].data[idx] != 0)
 				{
-					var tileIndex = testLevel.layers[layerIdx].data[idx] - 1;
-					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X) * (TILESET_TILE + TILESET_PADDING);
-					var sy = TILESET_PADDING + (Math.floor(tileIndex/TILESET_COUNT_Y)) * (TILESET_TILE + TILESET_PADDING);
-					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, x*TILE, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
+					cells[layerIdx][y][x] = 1;
+					cells[layerIdx][y][x+1] = 1;
+					cells[layerIdx][y-1][x+1] = 1;
+					cells[layerIdx][y-1][x] = 1;
+				}
+				else if(cells[layerIdx][y][x] != 1)
+				{
+					cells[layerIdx][y][x] = 0;
 				}
 				idx++;
 			}
@@ -88,18 +86,51 @@ function drawMap()
 	}
 }
 
+function tileToPixel(tile_coord)
+{
+	return tile_coord * map.TILE;
+}
+
+function pixelToTile(pixel)
+{
+	return Math.floor(pixel / map.TILE);
+}
+
+function cellAtTileCoord(layer, tx, ty)
+{
+	if(tx < 0 || tx > map.MAP_WIDTH || ty < 0)
+	{
+		return 1;
+	}
+	
+	if(ty >= map.MAP_HEIGHT)
+	{
+		return 0;
+	}
+	
+	return cells[layer][tx][ty];
+}
+
+function cellAtPixelCoord(layer, x, y)
+{
+	var tx = pixelToTile(x);
+	var ty = pixelToTile(y);
+	
+	return cellAtTileCoord(layer, tx, ty);
+}
+
 
 function run()
 {
-	drawMap();
-	
+	map.drawMap();
+
 	var deltaTime = getDeltaTime();
 	
 	player.update(deltaTime);
 	player.draw();
 	
-	enemy.update(deltaTime);
-	enemy.draw();
+	//enemy.update(deltaTime);
+	//enemy.draw();
 	
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -111,16 +142,18 @@ function run()
 		fpsCount = 0;
 	}		
 	
-	player.position.x = document.getElementById("playerx").value;
-	player.position.y = document.getElementById("playery").value;
+	//player.position.x = document.getElementById("playerx").value;
+	//player.position.y = document.getElementById("playery").value;
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
-	context.fillText("PlayerPos: " + player.position.toString(), 5, 40, 100);
-	context.fillText("EnemyPos: " + enemy.position.toString(), 5, 60, 100);
+	//context.fillText("PlayerPos: " + player.position.toString(), 5, 40, 1000);
+	//context.fillText("EnemyPos: " + enemy.position.toString(), 5, 60, 1000);
 }
+
+inititalizeCollision();
 
 //-------------------- Don't modify anything below here
 
