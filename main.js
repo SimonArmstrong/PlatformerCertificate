@@ -44,17 +44,54 @@ var fpsTime = 0;
 // load an image to draw
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
-var xYPointer = document.createElement("img");
-xYPointer.src = "xypointer.png";
 
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
 
+var layerCount = 6;
+var MAP = {tw: 20, th: 25};
+var TILE = 35;				//The Tile Dimensions on the X and Y
+var TILESET_TILE = TILE*2;
+var TILESET_PADDING = 2;
+var TILESET_SPACING = 2;
+var TILESET_COUNT_X = 14;	//Tiles along the x on the tileset image
+var TILESET_COUNT_Y = 14;	//Tiles along the y on the tileset image
+
+var MAP_WIDTH = (MAP.tw * TILE);
+var MAP_HEIGHT = (MAP.th * TILE);
+canvas.width = MAP_WIDTH;
+canvas.height = MAP_HEIGHT;
+
+var tileset = document.createElement("img");
+tileset.src = "tileset.png";
+
+function drawMap()
+{
+	for(var layerIdx = 0; layerIdx < layerCount; layerIdx++)
+	{
+		var idx = 0;
+		for(var y = 0; y < testLevel.layers[layerIdx].height; y++)
+		{
+			for(var x = 0; x < testLevel.layers[layerIdx].width; x++)
+			{
+				if(testLevel.layers[layerIdx].data[idx] != 0)
+				{
+					var tileIndex = testLevel.layers[layerIdx].data[idx] - 1;
+					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X) * (TILESET_TILE + TILESET_PADDING);
+					var sy = TILESET_PADDING + (Math.floor(tileIndex/TILESET_COUNT_Y)) * (TILESET_TILE + TILESET_PADDING);
+					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, x*TILE, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
+				}
+				idx++;
+			}
+		}
+	}
+}
+
+
 function run()
 {
-	context.fillStyle = "#ccc";		
-	context.fillRect(0, 0, canvas.width, canvas.height);
+	drawMap();
 	
 	var deltaTime = getDeltaTime();
 	
@@ -74,14 +111,8 @@ function run()
 		fpsCount = 0;
 	}		
 	
-	if(document.getElementById("subX"))
-	{
-		player.position.x = document.getElementById("playerx").value;
-	}
-	if(document.getElementById("subY"))
-	{
-		player.position.y = document.getElementById("playery").value;
-	}
+	player.position.x = document.getElementById("playerx").value;
+	player.position.y = document.getElementById("playery").value;
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
