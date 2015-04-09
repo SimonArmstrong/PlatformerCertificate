@@ -14,7 +14,7 @@ var Map = function(level, tilesetImage)
 	//this.LAYER_BACKGROUND_FAR = 1;
 	//this.LAYER_BACKGROUND_WALLS = 2;
 	this.LAYER_BACKGROUND = 0;
-	this.LAYER_PLATFORMS = 1;
+	this.LAYER_PLATFORMS = 4;
 	this.LAYER_LADDERS = 2;
 
 	this.tileset = document.createElement("img");

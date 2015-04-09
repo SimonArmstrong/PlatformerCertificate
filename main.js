@@ -44,7 +44,7 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
-var map = new Map(level1, "tileset.png");
+var map = new Map(testLevel, "tileset.png");
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
@@ -115,7 +115,7 @@ function cellAtPixelCoord(layer, x, y)
 {
 	var tx = pixelToTile(x);
 	var ty = pixelToTile(y);
-	
+	   
 	return cellAtTileCoord(layer, tx, ty);
 }
 
