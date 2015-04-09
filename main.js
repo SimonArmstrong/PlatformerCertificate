@@ -132,6 +132,11 @@ function run()
 	player.update(deltaTime);
 	player.draw();
 	
+	if(player.position.y > canvas.height)
+	{
+		player.position = new Vector2(277, 245);
+	}
+	
 	//console.log(player.position.toString());
 	
 	//enemy.update(deltaTime);
