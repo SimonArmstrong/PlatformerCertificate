@@ -4,6 +4,8 @@ var Map = function(level, tilesetImage)
 	this.level = level;
 	
 	this.TILE = level.tileheight;	//The Tile Dimensions on the X and Y
+	this.MAP_TILE_WIDTH = level.width;
+	this.MAP_TILE_HEIGHT = level.height;
 	this.MAP_WIDTH = level.width * this.TILE;
 	this.MAP_HEIGHT = level.height * this.TILE;
 	this.TILESET_TILE = level.tilesets[0].tileheight;

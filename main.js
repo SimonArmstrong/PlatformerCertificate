@@ -98,12 +98,12 @@ function pixelToTile(pixel)
 
 function cellAtTileCoord(layer, tx, ty)
 {
-	if(tx < 0 || tx > map.MAP_WIDTH || ty < 0)
+	if(tx < 0 || tx >= map.MAP_TILE_WIDTH || ty < 0)
 	{
 		return 1;
 	}
 	
-	if(ty >= map.MAP_HEIGHT)
+	if(ty >= map.MAP_TILE_HEIGHT)
 	{
 		return 0;
 	}
