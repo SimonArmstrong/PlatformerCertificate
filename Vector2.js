@@ -6,6 +6,10 @@ var Vector2 = function(x, y)
 	this.length = Math.sqrt(x*x + y*y);
 };
 
+Vector2.prototype.set = function(x,y)
+{
+	return new Vector2(x, y);
+}
 
 Vector2.prototype.add = function(vec){
 	var result = new Vector2(this.x + vec.x, this.y + vec.y);
