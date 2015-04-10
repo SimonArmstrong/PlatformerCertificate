@@ -46,7 +46,7 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
-var map = new Map(level1, "tileset.png");
+var map = new Map(testLevel, "tileset.png");
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
@@ -130,7 +130,23 @@ function cellAtPixelCoord(layer, x, y)
 
 function run()
 {
-
+	if(enemy.position.x < 0)
+	{
+		enemy.position.x = 0;
+	}
+	if(enemy.position.y < 0)
+	{
+		enemy.position.y = 0;
+	}
+	if(enemy.position.y > canvas.height)
+	{
+		enemy.position.y = canvas.height;
+	}
+	if(enemy.position.x > map.MAP_WIDTH)
+	{
+		enemy.position.x = map.MAP_WIDTH;
+	}
+	
 	context.fillStyle = "#579"
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
@@ -201,7 +217,6 @@ function run()
 		fps = fpsCount;
 		fpsCount = 0;
 	}		
-	
 	//player.position.x = document.getElementById("playerx").value;
 	//player.position.y = document.getElementById("playery").value;
 		

@@ -8,8 +8,9 @@ var ANIM_WALK_LEFT = 2;
 var ANIM_IDLE_RIGHT = 3;
 var ANIM_JUMP_RIGHT = 4;
 var ANIM_WALK_RIGHT = 5;
+var ANIM_CLIMB = 6;
 
-var ANIM_MAX = 6;
+var ANIM_MAX = 7;
 
 var Player = function() 
 {
@@ -29,6 +30,8 @@ var Player = function()
 		[60,61,62,63,64]);//Right jump animation
 	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/ gameSpeed, 
 		[65,66,67,68,69,70,71,72,73,74,75,76,77,78]);//Right walk animation
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/ gameSpeed, 
+		[42,43,44,45,46,47,48,49,50,51]);//Climb animation
 
 	this.position = new Vector2(277, 245);
 	this.scale = new Vector2(159, 180);
@@ -39,7 +42,7 @@ var Player = function()
 	this.jumping = false;
 	this.falling = false;
 	this.onLadder = false;
-	
+	this.glideTime = 3;
 	this.lives = 5;
 	
 	this.direction = LEFT;
@@ -82,7 +85,7 @@ Player.prototype.update = function(deltaTime)
 	var acceleration = new Vector2(0, 0);
 	var playerAccel = 5000 * gameSpeed;
 	var playerDrag = 11;
-	var jumpForce = 52000 /gameSpeed;
+	var jumpForce = 60000 /gameSpeed;
 	var playerGravity = map.TILE * 9.8 * 9;
 	
 	acceleration.y = playerGravity;
@@ -134,11 +137,21 @@ Player.prototype.update = function(deltaTime)
 	{
 		acceleration.y -= jumpForce;
 		this.jumping = true;
-	}	
+	}
+	if(this.falling && keyboard.isKeyDown(keyboard.KEY_SPACE))
+	{
+		this.glideTime -= deltaTime;
+		console.log(this.glideTime);
+		if(this.glideTime >= 0)
+		{
+			this.velocity.y = 40;
+		}
+
+	}
 	
 	if(keyboard.isKeyDown(keyboard.KEY_A))
 	{
-		this.playerShoot();
+		//this.playerShoot();
 	}
 
 	var dragVector = this.velocity.multiplyScalar(playerDrag);
@@ -153,6 +166,11 @@ Player.prototype.update = function(deltaTime)
 	if(this.jumping || this.falling)
 	{
 		this.changeDirectionalAnimation(ANIM_JUMP_LEFT, ANIM_JUMP_RIGHT);
+	}
+	else if(this.onLadder || (this.onLadder && this.jumping && this.falling))
+	{
+		this.sprite.setAnimation(ANIM_CLIMB);
+		this.velocity.x = 0;
 	}
 	else
 	{
@@ -176,10 +194,15 @@ Player.prototype.update = function(deltaTime)
 		if ((cell_down && !cell) || (cell_diag && !cell_right && nx))
 		{
 			this.position.y = tileToPixel(ty) - collisionOffset.y;
+			if(this.velocity.y > 2000)
+			{
+				player.health -= 100 / this.velocity.y * 200;
+			}
 			this.velocity.y = 0;
 			ny = 0;
 			
 			this.jumping = false;
+			this.glideTime = 3;
 		}
 	}
 
