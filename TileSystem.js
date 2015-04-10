@@ -11,19 +11,19 @@ var Map = function(level, tilesetImage)
 	this.TILESET_TILE = level.tilesets[0].tileheight;
 	this.TILESET_PADDING = level.tilesets[0].margin;
 	this.TILESET_SPACING = level.tilesets[0].spacing;
-	
+	this.cameraOffset = 0;
 	//this.LAYER_SKY = 0;
 	//this.LAYER_BACKGROUND_FAR = 1;
 	//this.LAYER_BACKGROUND_WALLS = 2;
 	this.LAYER_BACKGROUND = 0;
-	this.LAYER_PLATFORMS = 4;
+	this.LAYER_PLATFORMS = 1;
 	this.LAYER_LADDERS = 2;
 
 	this.tileset = document.createElement("img");
 	this.tileset.src = tilesetImage;
 };
 
-Map.prototype.drawMap = function()
+Map.prototype.drawMap = function(offsetX, offsetY)
 {
 	this.TILESET_COUNT_X = 14;	//Tiles along the x on the tileset image
 	this.TILESET_COUNT_Y = 14;	//Tiles along the y on the tileset image
@@ -39,7 +39,7 @@ Map.prototype.drawMap = function()
 					var tileIndex = this.level.layers[layerIdx].data[idx] - 1;
 					var sx = this.TILESET_PADDING + (tileIndex % this.TILESET_COUNT_X) * (this.TILESET_TILE + this.TILESET_PADDING);
 					var sy = this.TILESET_PADDING + (Math.floor(tileIndex/this.TILESET_COUNT_Y)) * (this.TILESET_TILE + this.TILESET_PADDING);
-					context.drawImage(this.tileset, sx, sy, this.TILESET_TILE, this.TILESET_TILE, x*this.TILE, (y-1)*this.TILE, this.TILESET_TILE, this.TILESET_TILE);
+					context.drawImage(this.tileset, sx, sy, this.TILESET_TILE, this.TILESET_TILE, x*this.TILE - offsetX, (y-1)*this.TILE - offsetY, this.TILESET_TILE, this.TILESET_TILE);
 				}
 				idx++;
 			}

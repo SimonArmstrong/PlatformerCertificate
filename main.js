@@ -32,7 +32,8 @@ function getDeltaTime()
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
-
+var gameSpeed = 1;
+var uiStyle = true;
 
 // some variables to calculate the Frames Per Second (FPS - this tells use
 // how fast our game is running, and allows us to make the game run at a 
@@ -45,16 +46,23 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
-var map = new Map(testLevel, "tileset.png");
+var map = new Map(level1, "tileset.png");
 var keyboard = new Keyboard();
 var player = new Player();
 var enemy = new Enemy();
 
+var bg_music = new Howl
+	({
+		urls:["background.ogg"],
+		loop:true,
+		buffer:true,
+		volume:0.5
+	});
+bg_music.play();
+var timer = 300;
 
-canvas.width = map.MAP_WIDTH;
+canvas.width = 960;
 canvas.height = map.MAP_HEIGHT;
-
-
 
 var cells = [];
 function inititalizeCollision()
@@ -120,28 +128,70 @@ function cellAtPixelCoord(layer, x, y)
 	return cellAtTileCoord(layer, tx, ty);
 }
 
-
 function run()
 {
-	context.fillStyle = "#fff"
+
+	context.fillStyle = "#579"
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
-	map.drawMap();
-	var deltaTime = getDeltaTime();
+	var xScroll = player.position.x - canvas.width/2;
 	
+	if(xScroll < 0)
+		xScroll = 0;
+	if(xScroll >= map.MAP_WIDTH - canvas.width)
+		xScroll = map.MAP_WIDTH - canvas.width;
+		
+	map.drawMap(xScroll, 0);
+	
+	var deltaTime = getDeltaTime() * gameSpeed;
+	
+	timer -= deltaTime;
+
+	enemy.update(deltaTime);
+	enemy.draw(xScroll, 0);
+		
 	player.update(deltaTime);
-	player.draw();
+	player.draw(xScroll, player.position.y/canvas.height);
+	
+	if(1) // Use 0 to switch HUD 1 to HUD 2
+	{
+		var staticHUD = document.createElement("img");
+		staticHUD.src = "hudMain.png";
+		var healthHUD = document.createElement("img");
+		healthHUD.src = "healthBar.png";
+		context.drawImage(healthHUD, 5, 5, player.health * 1.85, 50);
+		context.drawImage(staticHUD, 5, 5, 184, 50);
+		context.fillStyle = "#999";
+		context.font = "10px Arial";
+		context.fillText(Math.round(timer), 68, 38, 30);
+	}
+	else
+	{
+		var staticHUD = document.createElement("img");
+		staticHUD.src = "hudMainB.png";
+		var healthHUD = document.createElement("img");
+		healthHUD.src = "lifeImage.png";
+		context.drawImage(staticHUD, 0, 5, 184 * 2, 100);
+		
+		for(var i = 0; i < player.lives; i++)
+		{
+			context.drawImage(healthHUD, 8 + (i * 44), 14, 24, 24);
+		}
+	}
 	
 	if(player.position.y > canvas.height)
 	{
-		player.position = new Vector2(277, 245);
+		player.health -= 5;
+		if(player.health <= 0)
+		{
+			player.position = new Vector2(canvas.width/2, 245);
+			player.health = 100;
+			player.velocity.y =0;
+			player.lives--;
+		}
 	}
-	
 	//console.log(player.position.toString());
-	
-	//enemy.update(deltaTime);
-	//enemy.draw();
-	
+
 	// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -156,13 +206,12 @@ function run()
 	//player.position.y = document.getElementById("playery").value;
 		
 	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font="14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
+	//context.fillStyle = "#f00";
+	//context.font="14px Arial";
+	//context.fillText("FPS: " + fps, 5, 20, 100);
 	//context.fillText("PlayerPos: " + player.position.toString(), 5, 40, 1000);
 	//context.fillText("EnemyPos: " + enemy.position.toString(), 5, 60, 1000);
 }
-
 inititalizeCollision();
 
 //-------------------- Don't modify anything below here

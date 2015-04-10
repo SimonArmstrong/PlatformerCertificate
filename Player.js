@@ -17,21 +17,19 @@ var Player = function()
 	this.sprite = new Sprite("ChuckNorris.png");
 	
 	//set up all animations
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/gameSpeed, 
 		[0,1,2,3,4,5,6,7]);//Left idle animation
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/gameSpeed, 
 		[8,9,10,11,12]);//Left jump animation
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/gameSpeed, 
 		[13,14,15,16,17,18,19,20,21,22,23,24,25,26]);//Left walk animation
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/ gameSpeed, 
 		[52,53,54,55,56,57,58,59]);//Right idle animation
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/ gameSpeed, 
 		[60,61,62,63,64]);//Right jump animation
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05, 
+	this.sprite.buildAnimation(12, 8, 165, 126, 0.05/ gameSpeed, 
 		[65,66,67,68,69,70,71,72,73,74,75,76,77,78]);//Right walk animation
-		
-	
-	
+
 	this.position = new Vector2(277, 245);
 	this.scale = new Vector2(159, 180);
 	
@@ -40,12 +38,17 @@ var Player = function()
 	
 	this.jumping = false;
 	this.falling = false;
+	this.onLadder = false;
+	
+	this.lives = 5;
 	
 	this.direction = LEFT;
 	
 	this.velocity = new Vector2(0, 0);
 	this.angularVelocity = 0;
 	this.rotation = 0;
+	
+	this.health = 100;
 	
 	for(var i = 0; i < ANIM_MAX; i++)
 	{
@@ -77,19 +80,41 @@ Player.prototype.update = function(deltaTime)
 	this.sprite.update(deltaTime);
 	
 	var acceleration = new Vector2(0, 0);
-	var playerAccel = 5000;
+	var playerAccel = 5000 * gameSpeed;
 	var playerDrag = 11;
-	var jumpForce = 37500;
-	var playerGravity = map.TILE * 9.8 * 4;
+	var jumpForce = 52000 /gameSpeed;
+	var playerGravity = map.TILE * 9.8 * 9;
 	
 	acceleration.y = playerGravity;
 	
-	if(keyboard.isKeyDown(keyboard.KEY_LEFT))
+	var collisionOffset = new Vector2(-16, this.height/6 - map.TILE);
+	var collisionPos = this.position.add(collisionOffset);
+	var tx = pixelToTile(collisionPos.x);
+	var ty = pixelToTile(collisionPos.y);
+	
+	//var tx = pixelToTile(this.position.x);
+	//var ty = pixelToTile(this.position.y);
+	
+	var nx = this.position.x % map.TILE;
+	var ny = this.position.y % map.TILE;
+	var cell_ladder = cellAtTileCoord(map.LAYER_LADDERS, tx, ty);
+	//console.log(cell_ladder);
+	if(keyboard.isKeyDown(keyboard.KEY_UP) && cell_ladder)
+	{
+		acceleration.y -= playerAccel;
+		this.onLadder = true;
+	}
+	else
+	{
+		this.onLadder = false;
+	}
+	
+	if(keyboard.isKeyDown(keyboard.KEY_LEFT) && !this.onLadder)
 	{
 		acceleration.x -= playerAccel;
 		this.direction = LEFT;
 	}
-	if(keyboard.isKeyDown(keyboard.KEY_RIGHT))
+	if(keyboard.isKeyDown(keyboard.KEY_RIGHT) && !this.onLadder)
 	{
 		acceleration.x += playerAccel;
 		this.direction = RIGHT;
@@ -105,12 +130,16 @@ Player.prototype.update = function(deltaTime)
 		this.falling = false;
 	}
 	
-	if(keyboard.isKeyDown(keyboard.KEY_SPACE) && !this.jumping && !this.falling)
+	if(keyboard.isKeyDown(keyboard.KEY_SPACE) && !this.jumping && !this.falling && !this.onLadder)
 	{
 		acceleration.y -= jumpForce;
 		this.jumping = true;
+	}	
+	
+	if(keyboard.isKeyDown(keyboard.KEY_A))
+	{
+		this.playerShoot();
 	}
-
 
 	var dragVector = this.velocity.multiplyScalar(playerDrag);
 	dragVector.y = 0;
@@ -137,12 +166,6 @@ Player.prototype.update = function(deltaTime)
 		}
 	}
 	
-	var tx = pixelToTile(this.position.x);
-	var ty = pixelToTile(this.position.y);
-	
-	var nx = this.position.x % map.TILE;
-	var ny = this.position.y % map.TILE;
-	
 	var cell = cellAtTileCoord(map.LAYER_PLATFORMS, tx, ty);
 	var cell_right = cellAtTileCoord(map.LAYER_PLATFORMS, tx+1, ty);
 	var cell_down = cellAtTileCoord(map.LAYER_PLATFORMS, tx, ty+1);
@@ -152,9 +175,11 @@ Player.prototype.update = function(deltaTime)
 	{
 		if ((cell_down && !cell) || (cell_diag && !cell_right && nx))
 		{
-			this.position.y = tileToPixel(ty);
+			this.position.y = tileToPixel(ty) - collisionOffset.y;
 			this.velocity.y = 0;
 			ny = 0;
+			
+			this.jumping = false;
 		}
 	}
 
@@ -162,14 +187,14 @@ Player.prototype.update = function(deltaTime)
 	{
 		if((cell && !cell_down) || (cell_right && !cell_diag && nx))
 		{
-			this.position.y = tileToPixel(ty + 1);
+			this.position.y = tileToPixel(ty + 1) - collisionOffset.y;
 			this.velocity.y = 0;
 			
-			cell = cell_down;
+			/*cell = cell_down;
 			cell_right = cell_diag;
 			cell_down = cellAtTileCoord(map.LAYER_PLATFORMS, tx, ty+2);
 			cell_diag = cellAtTileCoord(map.LAYER_PLATFORMS, tx+1, ty+2);
-			
+			*/
 			ny = 0;
 		}
 	}
@@ -178,7 +203,7 @@ Player.prototype.update = function(deltaTime)
 	{
 		if((cell_right && !cell) || (cell_diag && !cell_down && ny))
 		{
-			this.position.x = tileToPixel(tx);
+			this.position.x = tileToPixel(tx) - collisionOffset.x;
 			this.velocity.x = 0;
 			//console.log("Hit: right");
 			nx = 0;
@@ -188,7 +213,7 @@ Player.prototype.update = function(deltaTime)
 	{
 		if((cell && !cell_right) || (cell_down && !cell_diag && ny))
 		{
-			this.position.x = tileToPixel(tx+1);
+			this.position.x = tileToPixel(tx+1) - collisionOffset.x;
 			this.velocity.x = 0;
 			
 			nx = 0;
@@ -196,7 +221,12 @@ Player.prototype.update = function(deltaTime)
 	}
 }
 
-Player.prototype.draw = function () 
+Player.prototype.playerShoot = function()
 {
-	this.sprite.draw(context, this.position.x, this.position.y);
+	var bullet = new Bullet();
+}
+
+Player.prototype.draw = function (offsetX, offsetY) 
+{
+	this.sprite.draw(context, this.position.x - offsetX, this.position.y - offsetY);
 }
